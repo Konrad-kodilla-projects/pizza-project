@@ -52,7 +52,30 @@
     menuProduct: Handlebars.compile(document.querySelector(select.templateOf.menuProduct).innerHTML),
   };
 
+  class Product {
+    constructor(id, data) {
+      this.id = id;
+      this.data = data;
+      this.renderInMenu();
+      console.log('New Product: ', this);
+    }
+
+    renderInMenu(){
+      const html = templates.menuProduct(this.data);
+      this.element = utils.createDOMFromHTML(html);
+
+      // const menuContainer = document.querySelector(select.containerOf.menu);
+      document.querySelector(select.containerOf.menu)
+        .appendChild(this.element);
+    }
+  }
+
   const app = {
+    initMenu: () => {
+      Object.keys(this.data.products)
+        .forEach(product => new Product(product, this.data.products[product]));
+    },
+    initData: () => this.data = dataSource,
     init: function(){
       const thisApp = this;
       console.log('*** App starting ***');
@@ -60,6 +83,9 @@
       console.log('classNames:', classNames);
       console.log('settings:', settings);
       console.log('templates:', templates);
+
+      this.initData();
+      this.initMenu();
     },
   };
 
