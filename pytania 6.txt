@@ -1,1 +1,5 @@
 1. Czy short if'y muszą mieć else?
+
+2. const thisProduct = this; => czy w ten sposób się zapisuje ten this czy to tylko edukacyjnie?
+
+3. zmienić sobie długość linii w prettier czy zostawić 80? (teraz ustawiłem 90)
