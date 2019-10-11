@@ -89,7 +89,7 @@
     }
 
     initOrderForm() {
-      this.form.addEventListener('submit', e =>{
+      this.form.addEventListener('submit', e => {
         e.preventDefault();
         this.processOrder();
       });
@@ -114,7 +114,7 @@
           Object.keys(params[param].options).map(option => {
             const optionData = params[param].options[option];
             let formDataOption = false;
-            formData[param] ? formDataOption = formData[param].includes(option) : null;
+            formData[param] ? (formDataOption = formData[param].includes(option)) : null;
 
             if (formDataOption && !optionData.default) {
               // console.log('zawiera i niedomyślna');
@@ -124,12 +124,17 @@
               price -= optionData.price;
             }
 
-            
+            const active = classNames.menuProduct.imageVisible;
+            const imageSelector = this.imageWrapper.querySelector(`.${param}-${option}`);
+            if (imageSelector) {
+              formDataOption
+                ? imageSelector.classList.add(active)
+                : imageSelector.classList.remove(active);
+            }
           });
         });
       }
       this.priceElem.innerHTML = price;
-
     }
 
     getElements() {
@@ -138,6 +143,7 @@
       this.formInputs = this.form.querySelectorAll(select.all.formInputs);
       this.cartButton = this.element.querySelector(select.menuProduct.cartButton);
       this.priceElem = this.element.querySelector(select.menuProduct.priceElem);
+      this.imageWrapper = this.element.querySelector(select.menuProduct.imageWrapper);
     }
   }
 
