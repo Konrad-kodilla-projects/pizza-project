@@ -1,5 +1,12 @@
 1. Czy short if'y muszą mieć else?
+return val1 || val2 || {} - pusty obiekt
 
 2. const thisProduct = this; => czy w ten sposób się zapisuje ten this czy to tylko edukacyjnie?
 
 3. zmienić sobie długość linii w prettier czy zostawić 80? (teraz ustawiłem 90)
+
+4. aplikacja w express? albo KOA
+
+JSON - server
+
+zeby przy updatecie strzelał do bazy
