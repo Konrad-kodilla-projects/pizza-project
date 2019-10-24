@@ -3,3 +3,23 @@
 2. czemu jak mam const app = {
     initMenu: function() {} - to mam this
     inna funcja: () => {} - to nie mam?
+
+3. Jak wygląda proces budowania aplikacji -> mockup html
+
+4. Git - komendy i czynności które trzeba znać w codziennej pracy
+
+5. Jak ukrywać np API key w JS tak jak w plikach .env żeby nie wrzucać na github?
+===
+w dockerze, node env
+
+======
+
+stosować wewnętrze metody jak mają własne
+
+Git
+merge squash - zmiana pull requesta
+cherry pick
+
+no backend approach
+
+Google firebase -> fajna baza za darmo

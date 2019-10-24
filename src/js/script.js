@@ -335,7 +335,7 @@
       this.update();
     }
 
-    sendOrder() {
+    async sendOrder() {
       const { url, order } = settings.db;
       const {address, phone} = this.dom;
 
@@ -360,9 +360,12 @@
         body: JSON.stringify(payload)
       };
 
-      fetch(`${url}/${order}`, options)
+      await fetch(`${url}/${order}`, options)
         .then(res => res.json())
-        .then(parsedData => console.log(parsedData));
+        .then(parsedData => {
+          console.log(parsedData);
+        });
+      console.log('tutaj jestem');
     }
 
     getData(obj){
