@@ -1,0 +1,5 @@
+1. w jaki sposób używać fukcji z async await w klasie/obiekcie jako metody?
+
+2. czemu jak mam const app = {
+    initMenu: function() {} - to mam this
+    inna funcja: () => {} - to nie mam?
