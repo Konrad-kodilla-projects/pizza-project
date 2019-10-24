@@ -74,8 +74,8 @@
     db: {
       url: '//localhost:3131',
       product: 'product',
-      order: 'order',
-    },
+      order: 'order'
+    }
   };
 
   const templates = {
@@ -267,12 +267,13 @@
     }
 
     getElements(elem) {
-      const { toggleTrigger, productList } = select.cart;
       this.dom = {
-        wrapper: elem,
-        toggleTrigger: elem.querySelector(toggleTrigger),
-        productList: elem.querySelector(productList)
+        wrapper: elem
       };
+
+      Object.keys(select.cart).map(key => {
+        this.dom[key] = this.dom.wrapper.querySelector(select.cart[key]);
+      });
 
       this.renderTotalsKeys = [
         'totalNumber',
@@ -286,15 +287,19 @@
     }
 
     initActions() {
-      this.dom.toggleTrigger.addEventListener('click', e => {
+      const { toggleTrigger, wrapper, productList, form } = this.dom;
+
+      toggleTrigger.addEventListener('click', e => {
         e.preventDefault();
-        this.dom.wrapper.classList.toggle(classNames.cart.wrapperActive);
+        wrapper.classList.toggle(classNames.cart.wrapperActive);
       });
 
-      this.dom.productList.addEventListener('updated', () => this.update());
-      this.dom.productList.addEventListener('remove', e =>
-        this.remove(e.detail.cartProduct)
-      );
+      productList.addEventListener('updated', () => this.update());
+      productList.addEventListener('remove', e => this.remove(e.detail.cartProduct));
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        this.sendOrder();
+      });
     }
 
     add(product) {
@@ -328,6 +333,49 @@
       this.products.splice(this.products.indexOf(cartProduct), 1);
       cartProduct.dom.wrapper.remove();
       this.update();
+    }
+
+    async sendOrder() {
+      const { url, order } = settings.db;
+      const {address, phone} = this.dom;
+
+      const payload = {
+        address: address.value,
+        phone: phone.value,
+        totalPrice: this.totalPrice,
+        totalNumber: this.totalNumber,
+        subtotalPrice: this.subtotalPrice,
+        deliveryFee: this.deliveryFee,
+        products: []
+      };
+      this.products.map(product =>{
+        payload.products.push(this.getData(product));
+      });
+
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      };
+
+      await fetch(`${url}/${order}`, options)
+        .then(res => res.json())
+        .then(parsedData => {
+          console.log(parsedData);
+        });
+      console.log('tutaj jestem');
+    }
+
+    getData(obj){
+      return {
+        id: obj.id,
+        amount: obj.amount,
+        price: obj.price,
+        priceSingle: obj.priceSingle,
+        params: obj.params
+      };
     }
   }
 
@@ -390,7 +438,7 @@
 
   const app = {
     initMenu: function() {
-      const {products} = this.data;
+      const { products } = this.data;
       Object.keys(products).forEach(
         product => new Product(products[product].id, products[product])
       );
@@ -398,7 +446,7 @@
 
     initData: function() {
       this.data = {};
-      const {url, product} = settings.db;
+      const { url, product } = settings.db;
       fetch(`${url}/${product}`)
         .then(rawRes => rawRes.json())
         .then(parsedData => {
