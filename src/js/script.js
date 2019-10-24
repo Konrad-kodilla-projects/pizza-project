@@ -62,6 +62,7 @@
       this.getElements();
       this.initAccordion();
       this.initOrderForm();
+      this.initAmountWidget();
       this.processOrder();
       // console.log('New Product: ', this);
     }
@@ -104,6 +105,11 @@
       });
     }
 
+    initAmountWidget() {
+      this.amountWidget = new AmountWidget(this.amountWidgetElem);
+      this.amountWidgetElem.addEventListener('updated', () => this.processOrder());
+    }
+
     processOrder() {
       const formData = utils.serializeFormToObject(this.form);
       let price = this.data.price;
@@ -134,8 +140,10 @@
           });
         });
       }
+      price *= this.amountWidget.value;
       this.priceElem.innerHTML = price;
     }
+
 
     getElements() {
       this.accordionTrigger = this.element.querySelector(select.menuProduct.clickable);
@@ -144,6 +152,57 @@
       this.cartButton = this.element.querySelector(select.menuProduct.cartButton);
       this.priceElem = this.element.querySelector(select.menuProduct.priceElem);
       this.imageWrapper = this.element.querySelector(select.menuProduct.imageWrapper);
+      this.amountWidgetElem = this.element.querySelector(select.menuProduct.amountWidget);
+    }
+  }
+
+
+  class AmountWidget {
+    constructor(elem) {
+      this.value = 1;
+
+      this.getElements(elem);
+      this.setValue(this.input.value);
+      this.initActions();
+      console.log('TCL: AmountWidget -> constructor -> elem', this);
+    }
+
+    setValue(val) {
+      const newValue = parseInt(val);
+      const range = settings.amountWidget;
+      if (newValue !== this.value && newValue >= range.defaultMin && newValue <= range.defaultMax) {
+
+        this.value = newValue;
+        this.announce();
+      }
+      this.input.value = this.value;
+    }
+
+    initActions() {
+      this.input.addEventListener('change', () => this.setValue(this.input.value));
+
+      this.linkDecrease.addEventListener('click', e => {
+        e.preventDefault();
+        // Na rozmowę => nie prościej jest this.value++?
+        this.setValue(this.value - 1);
+      });
+
+      this.linkIncrease.addEventListener('click', e => {
+        e.preventDefault();
+        this.setValue(this.value + 1);
+      });
+    }
+
+    announce() {
+      const event = new Event('updated');
+      this.element.dispatchEvent(event);
+    }
+
+    getElements(element){
+      this.element = element;
+      this.input = this.element.querySelector(select.widgets.amount.input);
+      this.linkDecrease = this.element.querySelector(select.widgets.amount.linkDecrease);
+      this.linkIncrease = this.element.querySelector(select.widgets.amount.linkIncrease);
     }
   }
 
@@ -155,12 +214,10 @@
     },
     initData: () => (this.data = dataSource),
     init: function() {
-      const thisApp = this;
-      console.log('*** App starting ***');
-      console.log('thisApp:', thisApp);
-      console.log('classNames:', classNames);
-      console.log('settings:', settings);
-      console.log('templates:', templates);
+      // console.log('*** App starting ***');
+      // console.log('classNames:', classNames);
+      // console.log('settings:', settings);
+      // console.log('templates:', templates);
 
       this.initData();
       this.initMenu();
