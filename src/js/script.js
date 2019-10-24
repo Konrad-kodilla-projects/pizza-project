@@ -5,7 +5,7 @@
   const select = {
     templateOf: {
       menuProduct: '#template-menu-product',
-      cartProduct: '#template-cart-product', // CODE ADDED
+      cartProduct: '#template-cart-product',
     },
     containerOf: {
       menu: '#product-list',
@@ -26,12 +26,11 @@
     },
     widgets: {
       amount: {
-        input: 'input.amount', // CODE CHANGED
+        input: 'input.amount',
         linkDecrease: 'a[href="#less"]',
         linkIncrease: 'a[href="#more"]',
       },
     },
-    // CODE ADDED START
     cart: {
       productList: '.cart__order-summary',
       toggleTrigger: '.cart__summary',
@@ -50,7 +49,6 @@
       edit: '[href="#edit"]',
       remove: '[href="#remove"]',
     },
-    // CODE ADDED END
   };
   
   const classNames = {
@@ -58,11 +56,9 @@
       wrapperActive: 'active',
       imageVisible: 'active',
     },
-    // CODE ADDED START
     cart: {
       wrapperActive: 'active',
     },
-    // CODE ADDED END
   };
   
   const settings = {
@@ -70,19 +66,15 @@
       defaultValue: 1,
       defaultMin: 1,
       defaultMax: 9,
-    }, // CODE CHANGED
-    // CODE ADDED START
+    },
     cart: {
       defaultDeliveryFee: 20,
     },
-    // CODE ADDED END
   };
   
   const templates = {
     menuProduct: Handlebars.compile(document.querySelector(select.templateOf.menuProduct).innerHTML),
-    // CODE ADDED START
     cartProduct: Handlebars.compile(document.querySelector(select.templateOf.cartProduct).innerHTML),
-    // CODE ADDED END
   };
 
   class Product {
@@ -237,18 +229,47 @@
     }
   }
 
+
+  class Cart {
+    constructor(elem) {
+      this.products = [];
+      this.getElements(elem);
+      this.initActions();
+    }
+
+    getElements(elem) {
+      this.dom = {
+        wrapper: elem,
+        toggleTrigger: elem.querySelector(select.cart.toggleTrigger)
+      };
+    }
+
+    initActions() {
+      this.dom.toggleTrigger.addEventListener('click', e =>{
+        e.preventDefault();
+        this.dom.wrapper.classList.toggle(classNames.cart.wrapperActive);
+      });
+    }
+  }
+
   const app = {
     initMenu: () => {
       Object.keys(this.data.products).forEach(
         product => new Product(product, this.data.products[product])
       );
     },
-    
+
     initData: () => (this.data = dataSource),
+
+    initCart: () => {
+      const cart = document.querySelector(select.containerOf.cart);
+      this.cart = new Cart(cart);
+    },
 
     init: function() {
       this.initData();
       this.initMenu();
+      this.initCart();
     }
   };
 
