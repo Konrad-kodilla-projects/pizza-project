@@ -9,6 +9,7 @@ export class HourPicker extends BaseWidget {
     const { input, output } = select.widgets.hourPicker;
     this.dom.input = this.dom.wrapper.querySelector(input);
     this.dom.output = this.dom.wrapper.querySelector(output);
+    this.value = settings.hours.open;
 
     this.initPlugin();
   }

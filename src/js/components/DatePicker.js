@@ -31,7 +31,7 @@ export class DatePicker extends BaseWidget {
       locale: {
         'firstDayOfWeek': 1
       },
-      onChange: function(dateStr) {
+      onChange: dateStr => {
         this.value = dateStr;
       }
     });
