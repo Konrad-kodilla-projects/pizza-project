@@ -1,0 +1,3 @@
+1. Czy na przykład warto pobawić się codewars?
+
+2. Konwencje nazywania zmniennych, funkcji i klas

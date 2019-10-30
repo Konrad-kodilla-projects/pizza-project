@@ -30,7 +30,12 @@ export class Booking {
     this.peopleAmount = new AmountWidget(this.dom.peopleAmount);
     this.datePicker = new DatePicker(this.dom.datePicker);
     this.hourPicker = new HourPicker(this.dom.hourPicker);
+    /* 
+    zrobiłem tak bo
+    wywalało mi this na undefined, jak robiłem self to też się chyba gubił
     this.dom.wrapper.addEventListener('updated', () => this.updateDom());
+    */
+    this.dom.wrapper.addEventListener('updated', this.updateDom.bind(this));
   }
 
   getData() {
@@ -107,6 +112,24 @@ export class Booking {
       hour = (Number(hour) + 0.5).toString();
     }
   }
+
+  // updateDom = () => {
+  //   const {tableIdAttribute: id} = settings.booking;
+  //   this.date = this.datePicker.value;
+  //   this.hour = utils.hourToNumber(this.hourPicker.value);
+
+  //   this.dom.tables.forEach(table => {
+  //     const tableId = table.getAttribute(id);
+  //     const bookDate = this.booked[this.date];
+  //     const {tableBooked} = classNames.booking;
+
+  //     if(bookDate && bookDate[this.hour] && bookDate[this.hour].includes(Number(tableId))){
+  //       table.classList.add(tableBooked);
+  //     } else {
+  //       table.classList.remove(tableBooked);
+  //     }
+  //   });
+  // }
 
   updateDom() {
     const {tableIdAttribute: id} = settings.booking;
