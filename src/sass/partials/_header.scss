@@ -3,6 +3,11 @@
   background: $color-dark;
   color: $color-light;
 
+  &.hide {
+    padding: ($base-size * 5) 0 ($base-size * 5) 0;
+    display: block;
+  }
+
   &__wrapper {
     position: relative;
   }
@@ -39,6 +44,10 @@
   position: absolute;
   @include flex(row, flex-start, flex-start);
   bottom: ($base-size * -8);
+
+  &.hide {
+    display: none;
+  }
 
   a {
     @extend .h2;
