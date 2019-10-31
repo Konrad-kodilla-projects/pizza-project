@@ -255,5 +255,27 @@
       "starters": ["lemonWater"]
     }
   ],
-  "booking": []
+  "booking": [],
+  "slider": [
+    {
+      "id": 1,
+      "src": "./images/assets/pizza-3.jpg",
+      "heading": "Super service!",
+      "content": "Please note that this approach is not recommended for production applications. A better way is to precompile your templates. This will result in a smaller require",
+      "name": "Donatello"
+    },
+    {
+      "id": 2,
+      "src": "./images/assets/pizza-4.jpg",
+      "heading": "amazing service!",
+      "content": "Handlebars will not escape a Handlebars.SafeString. If you write a helper that generates its own HTML, you will usually want to return a ","name": "Nonna Alba's Pizza"
+    },
+    {
+      "id": 3,
+      "src": "./images/assets/pizza-3.jpg",
+      "heading": "Super pasta bolognese!",
+      "content": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Vitae sapiente eaque quo pariatur, aut alias.",
+      "name": "Mercosur"
+    }
+  ]
 }
