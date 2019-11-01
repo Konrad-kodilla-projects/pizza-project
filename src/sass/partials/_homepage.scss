@@ -29,18 +29,16 @@
     background-color: antiquewhite;
     border-radius: $radius;
     text-align: center;
-    
+    background-position: center;
+    object-fit: contain;
+    cursor: pointer;
 
     &#order {
       background-image: url('/images/assets/pizza-1.jpg');
-      background-position: center;
-      object-fit: contain;
     }
 
     &#booking {
       background-image: url('/images/assets/pizza-2.jpg');
-      background-position: center;
-      object-fit: contain;
     }
 
     &:hover {
