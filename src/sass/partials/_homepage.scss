@@ -14,6 +14,8 @@
   border-radius: $radius;
 }
 
+/* Top */
+
 .top {
   &__flex {
     display: flex;
@@ -21,13 +23,13 @@
   }
 
   &__flex-2 {
-    // @include flex(column, center, center);
     position: relative;
     flex: 0 0 49%;
     height: 120px;
     background-color: antiquewhite;
     border-radius: $radius;
     text-align: center;
+    
 
     &#order {
       background-image: url('/images/assets/pizza-1.jpg');
@@ -182,18 +184,27 @@
   }
 
   &__box {
-    flex: 0 0 30%;
+    position: relative;
     width: 195px;
     height: 195px;
     margin: 5px 0;
+    overflow: hidden;
 
-    &:hover .overlay{
-      position: absolute;
-      opacity: 0.5;
-      width: inherit;
-      height: inherit;
-      background-color: #000;
-      border-radius: $radius;
+    &:hover {
+      .overlay{
+        position: absolute;
+        opacity: 0.5;
+        width: inherit;
+        height: inherit;
+        background-color: #000;
+        border-radius: $radius;
+        transition: all 1s;
+      }
+
+      .images__icons {
+        @include center;
+        transition: all 0.5s;
+      }
     }
   }
 
@@ -202,19 +213,28 @@
     height: inherit;
     object-fit: cover;
     border-radius: $radius;
-
-    // &:hover .overlay{
-    //   position: absolute;
-    //   opacity: 0.5;
-    //   width: inherit;
-    //   height: inherit;
-    //   background-color: #000;
-    // }
   }
-  // .overlay{
-  //   opacity: 0.5;
-  //   width: 100%;
-  //   height: 100%;
-  //   background-color: #000;
-  // }
+
+  &__icons{
+    position: absolute;
+    color: #fff;
+    left: 50%;
+    top: 110%;
+    transform: translateX(-50%);
+    transition: all 0.5s;
+
+    i {
+      font-size: 24px;
+      margin: 0 10px;
+      &:hover {
+        color: $color-main;
+      }
+    }
+  }
+}
+
+
+/* Footer */
+.footer__link {
+  color: $color-main;
 }
