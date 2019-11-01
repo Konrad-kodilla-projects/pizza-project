@@ -66,15 +66,16 @@
   </header>
 
   <div id="pages">
+    <section id="home">
+      <div class="home-wrapper container"></div>
+    </section>
     <section id="order">
       <div id="product-list" class="product-list container"></div>
     </section>
     <section id="booking">
       <div class="booking-wrapper container"></div>
     </section>
-    <section id="home">
-      <div class="home-wrapper container"></div>
-    </section>
+
   </div>
 
   <script id="template-home" type="text/x-handlebars-template">
@@ -113,7 +114,23 @@
           </div>
         </div>
         {{/each}}
-
+      </div>
+      <div class="slider__dots">
+      {{#each slider}}
+        <div class="slider__dot" dot-id="{{id}}"></div>
+      {{/each}}
+      </div>
+      
+      <!-- Portfolio -->
+      <div class="images">
+        <div class="images__wrapper">
+          {{#each images}}
+            <div class="images__box">
+              <div class="overlay"></div>
+              <img src="{{src}}" alt="" class="images__img">
+            </div>
+          {{/each}}
+        </div>
       </div>
     </div>
   </script>

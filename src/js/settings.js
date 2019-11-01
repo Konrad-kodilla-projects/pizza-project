@@ -75,7 +75,14 @@ export const select = {
   nav: {
     links: '.main-nav a',
   },
-  slider: '.slider'
+  slider: {
+    slider: '.slider',
+    dot: '.slider__dot'
+  },
+  homePage: {
+    orderLink: '#order',
+    bookingLink: '#booking'
+  }
 };
 
 export const classNames = {
@@ -130,6 +137,7 @@ export const settings = {
     booking: 'booking',
     event: 'event',
     slider: 'slider',
+    porfolio: 'porfolio',
     dateStartParamKey: 'date_gte',
     dateEndParamKey: 'date_lte',
     notRepeatParam: 'repeat=false',

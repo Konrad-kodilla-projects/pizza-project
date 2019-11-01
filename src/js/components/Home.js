@@ -4,26 +4,41 @@ export class Home {
   constructor(elem) {
     this.data = {};
     this.slideId = 0;
-    this.getData(elem);
+    this.init(elem);
+  }
+
+  async init(elem) {
+    const {url, slider, porfolio} = settings.db;
+
+    /* Get slides */
+    const responseSlider = await fetch(`${url}/${slider}`);
+    const parsedData = await responseSlider.json();
+    this.data.slider = parsedData;
+
+    /* Get portfolio images */
+    const responsePortfolio = await fetch(`${url}/${porfolio}`);
+    this.data.images = await responsePortfolio.json();
+    // console.log('data collected');
+
+    /* Render elements */    
+    this.render(elem);
+    this.initSlider();
     this.initActions();
   }
 
   render(elem) {
     /* Add handlebars context to wrapper */
     elem.innerHTML = templates.homePage(this.data);
+    const {slider, dot} = select.slider;
+    const {orderLink, bookingLink} = select.homePage;
 
     this.dom = {
       wrapper: elem,
-      slider: elem.querySelectorAll(select.slider)
+      slider: elem.querySelectorAll(slider),
+      dot: elem.querySelectorAll(dot),
+      orderLink: elem.querySelector(orderLink),
+      bookingLink: elem.querySelector(bookingLink)
     };
-  }
-
-  initActions() {
-    const { mainNav, cart, header } = select.containerOf;
-    const { hide } = classNames.home;
-    [mainNav, cart, header].forEach(elem =>
-      document.querySelector(elem).classList.add(hide)
-    );
   }
 
   initSlider(){
@@ -32,18 +47,33 @@ export class Home {
       slide.classList.toggle(prev, slide.classList.contains(active));
       slide.classList.toggle(active, this.slideId == id);
     });
+
+    this.dom.dot.forEach((dot, id) =>{
+      dot.classList.toggle(active, this.slideId == id);
+    });
+
     this.slideId < this.data.slider.length - 1 ? this.slideId++ : this.slideId = 0;
     setTimeout(this.initSlider.bind(this), 4000); 
   }
 
-  async getData(elem) {
-    const {url, slider} = settings.db;
-    const response = await fetch(`${url}/${slider}`);
-    const parsedData = await response.json();
-    this.data.slider = parsedData;
-    // console.log('pobrano dane');
-    this.render(elem);
-    this.initSlider();
-
+  initActions() {
+    const {bookingLink, orderLink} = select.homePage;
+    this.dom.bookingLink.addEventListener('click', () =>{
+      this.announce(bookingLink);
+    });
+    this.dom.orderLink.addEventListener('click', () =>{
+      this.announce(orderLink);
+    });
   }
+  
+  announce(id) {
+    this.dom.wrapper.dispatchEvent(new CustomEvent('change-page', {
+      bubbles: true,
+      detail: {
+        id: id.replace('#', '')
+      }
+    }));
+  }
+
+
 }
