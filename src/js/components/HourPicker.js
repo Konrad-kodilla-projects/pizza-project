@@ -3,13 +3,14 @@ import { settings, select } from '../settings.js';
 import { utils } from '../utils.js';
 
 export class HourPicker extends BaseWidget {
-  constructor(wrapper) {
+  constructor(wrapper, initValue) {
     super(wrapper, settings.hours.open);
+    console.log('TCL: HourPicker -> constructor -> initValue', initValue);
 
     const { input, output } = select.widgets.hourPicker;
     this.dom.input = this.dom.wrapper.querySelector(input);
     this.dom.output = this.dom.wrapper.querySelector(output);
-    this.value = settings.hours.open;
+    this.value = initValue || settings.hours.open;
 
     this.initPlugin();
   }

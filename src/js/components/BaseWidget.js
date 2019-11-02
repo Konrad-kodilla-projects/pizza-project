@@ -4,6 +4,7 @@ export class BaseWidget {
       wrapper: wrapper
     };
     this._value = initValue;
+    console.log('TCL: BaseWidget -> constructor -> initValue', initValue);
   }
 
   get value(){

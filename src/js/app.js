@@ -40,12 +40,10 @@ const app = {
     if (hash.length > 2) {
       pagesHash = this.pages.filter(page => page.id == hash.replace('#/', ''));
       if (!pagesHash.length) {
-        pagesHash = this.pages.filter(
-          page => page.id == hash.substring(2,9)
-        );
+        pagesHash = this.pages.filter(page => page.id == hash.substring(2, 9));
       }
     }
-    this.activatePage(pagesHash.length ? pagesHash[0].id : this.pages[0].id);
+    this.activatePage(pagesHash.length ? pagesHash[0].id : this.pages[0].id, hash.substring(10));
 
     this.navlinks.forEach(link => {
       link.addEventListener('click', e => {
@@ -57,18 +55,16 @@ const app = {
     this.pages.forEach(page => {
       page.addEventListener('change-page', e => this.activatePage(e.detail.id));
     });
+
+    window.addEventListener('hashchange', this.initPages.bind(this));
   },
 
   initBooking: () => new Booking(document.querySelector(select.containerOf.booking)),
 
   initHome: () => new Home(document.querySelector(select.containerOf.home)),
 
-  activatePage: function(id) {
+  activatePage: function(id, uuid='') {
     const { active } = classNames.nav;
-    let updateId = id;
-    const re = /\w+\/\w+/;
-    re.test(id) ? (id = id.replace(re, '')) : null;
-    const update = re.test(id);
 
     this.navlinks.forEach(link => {
       link.classList.toggle(active, link.getAttribute('href') == `#${id}`);
@@ -76,7 +72,7 @@ const app = {
     this.pages.forEach(page =>
       page.classList.toggle(active, page.getAttribute('id') == id)
     );
-    update ? (window.location.hash = updateId) : (window.location.hash = `#/${id}`);
+    uuid ? window.location.hash = `#/${id}/${uuid}` : (window.location.hash = `#/${id}`);
     this.toggleNavElements(id);
   },
 

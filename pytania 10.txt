@@ -11,3 +11,6 @@
 
 5. Jakie bardziej zaawansowanie rzeczy o css należy wiedzieć? np animacje
     lub co na pewno trzeba umieć zrobić?
+
+6 jak podchodzić do bardziej złożonych zadań?
+    zapisywać sobie kroki w kodzie? na kartce?

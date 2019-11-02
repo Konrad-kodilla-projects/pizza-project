@@ -6,17 +6,39 @@ import { utils } from '../utils.js';
 
 export class Booking {
   constructor(elem) {
+    this.db = settings.db;
+
+    this.initPage(elem);
+  }
+
+  async initPage(elem) {
     this.render(elem);
+
+    /* Check if booking has uuid */
+    const { hash } = window.location;
+    const re = /#\/\w+\/\w+/;
+    re.test(hash) ? await this.updateBookingData(hash.substring(10)) : null;
+    // console.log('data should be collected');
+
     this.initWidgets();
     this.getData();
-    // this.updateBooking();
   }
-  /*  NA ROZMOWĘ
-  Czy this.dom można zapisać jakoś ładniej? bez pisania milion razy tego samego?  */
+
   render(elem) {
-    const { peopleAmount, hoursAmount, tables, button, address, phone, starter } = select.booking;
+    const {
+      peopleAmount,
+      hoursAmount,
+      tables,
+      button,
+      address,
+      phone,
+      starter
+    } = select.booking;
     const { datePicker, hourPicker } = select.widgets;
     elem.innerHTML = templates.bookingWidget();
+
+    /*  NA ROZMOWĘ
+    Czy this.dom można zapisać jakoś ładniej? bez pisania milion razy tego samego?  */
     this.dom = {
       wrapper: elem,
       peopleAmount: elem.querySelector(peopleAmount),
@@ -35,7 +57,8 @@ export class Booking {
     this.hoursAmount = new AmountWidget(this.dom.hoursAmount);
     this.peopleAmount = new AmountWidget(this.dom.peopleAmount);
     this.datePicker = new DatePicker(this.dom.datePicker);
-    this.hourPicker = new HourPicker(this.dom.hourPicker);
+    this.hourPicker = new HourPicker(this.dom.hourPicker, 14);
+    // this.hourPicker.value = 14;
     /* NA ROZMOWĘ
     wrzuciłem tutaj .bind i działa fajnie -> pytanie czy to dobrze?
     inaczej this leci na window,
@@ -151,9 +174,9 @@ export class Booking {
   }
 
   async sendBooking() {
-    const {url, booking} = settings.db;
+    const { url, booking } = settings.db;
 
-    if(this.tableId) {
+    if (this.tableId) {
       const payload = {
         uuid: utils.uuid(),
         date: this.date,
@@ -173,7 +196,7 @@ export class Booking {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
-        },          
+        },
         body: JSON.stringify(payload)
       });
 
@@ -200,14 +223,29 @@ export class Booking {
     }
   }
 
-  updateBooking() {
-    // const { datePicker, hourPicker } = select.widgets;
-    // this.dom.wrapper.querySelector(hourPicker.input).value = 19;
-    // const hourUpdate = new HourPicker(this.dom.hourPicker);
+  async updateBookingData(uuid) {
+    const response = await fetch(`${this.db.url}/${this.db.booking}`);
+    const parsedData = await response.json();
+    this.bookingToUpdate = parsedData.filter(booking => booking.uuid === uuid)[0];
+    const {date, duration, hour, peopleAmount, table, starters, phone, address} = this.bookingToUpdate;
+    
+    const { datePicker, hourPicker } = select.widgets;
+    // this.dom.wrapper.querySelector(hourPicker.input).value = hour;
+    // this.dom.wrapper.querySelector(hourPicker.input).value = 14;
+    this.dom.wrapper.querySelector(datePicker.input).value = date;
+    
+    
+    // const hourUpdate = new HourPicker(this.dom.hourPicker, 15);
+    // hourUpdate.value = 19;
     // const test = this.dom.wrapper.querySelector(hourPicker.output);
     // const test = this.dom.wrapper.querySelector('.hour-picker');
     // this.hourPicker.value = 19;
-    // this.hoursAmount.value = 5;
-    // hourUpdate.value = 19;
+    this.dom.hoursAmount.querySelector('input').setAttribute('value', duration);
+    this.dom.peopleAmount.querySelector('input').value = peopleAmount;
+    this.dom.starter.forEach(starter =>{
+      starters.includes(starter.value) ? starter.checked = true : null;
+    });
+    this.dom.phone.value = phone;
+    this.dom.address.value = address;
   }
 }
