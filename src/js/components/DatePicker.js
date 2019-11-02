@@ -3,7 +3,7 @@ import { utils } from '../utils.js';
 import { select, settings } from '../settings.js';
 
 export class DatePicker extends BaseWidget {
-  constructor(wrapper, updatedDate){
+  constructor(wrapper, updatedDate=0){
     super(wrapper, utils.dateToStr(new Date()));
 
     const {input} = select.widgets.datePicker;

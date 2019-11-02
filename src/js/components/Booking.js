@@ -10,6 +10,8 @@ export class Booking {
     this.toUpdate = {};
 
     this.initPage(elem);
+    console.log(location);
+
   }
 
   async initPage(elem) {
@@ -19,11 +21,10 @@ export class Booking {
     const { hash } = window.location;
     const re = /#\/\w+\/\w+/;
     re.test(hash) ? await this.updateBookingData(hash.substring(10)) : null;
-    // console.log('data should be collected');
 
     this.initWidgets();
     await this.getData();
-    console.log('234');
+    this.removeBooked(this.toUpdate);
   }
 
   render(elem) {
@@ -56,7 +57,7 @@ export class Booking {
   }
 
   initWidgets() {
-    const {date, duration, peopleAmount, hour} = this.toUpdate;
+    const { date, duration, peopleAmount, hour } = this.toUpdate;
 
     this.hoursAmount = new AmountWidget(this.dom.hoursAmount, duration);
     this.peopleAmount = new AmountWidget(this.dom.peopleAmount, peopleAmount);
@@ -118,13 +119,13 @@ export class Booking {
     const parsedData = {
       bookings: await responses.booking.json(),
       eventsCurrent: await responses.eventsCurrent.json(),
-      eventsRepeat: await responses.eventsRepeat.json(),
+      eventsRepeat: await responses.eventsRepeat.json()
     };
 
     this.parseData(parsedData);
   }
 
-  parseData({bookings, eventsCurrent, eventsRepeat}) {
+  parseData({ bookings, eventsCurrent, eventsRepeat }) {
     this.booked = {};
     const { maxDays, minDate } = this.datePicker;
     eventsCurrent.forEach(event => this.makeBooked(event));
@@ -141,12 +142,23 @@ export class Booking {
   makeBooked({ date, hour, duration, table }) {
     !this.booked[date] ? (this.booked[date] = {}) : null;
     let bookDate = this.booked[date];
-    hour = /:30/.test(hour) ? hour.replace(':30', '.5') : hour.replace(':00', '');
+    hour = utils.hourToNumber(hour);
 
     for (let i = 0; i <= duration * 2 - 1; i++) {
       !bookDate[hour] ? (bookDate[hour] = [table]) : bookDate[hour].push(table);
-      hour = (Number(hour) + 0.5).toString();
+      hour += 0.5;
     }
+  }
+
+  removeBooked({ date, hour, duration, table }) {
+    const bookDate = this.booked[date];
+
+    for (let i = 0; i <= duration * 2 - 1; i++) {
+      bookDate[hour] ? bookDate[hour].splice(bookDate[hour].indexOf(table), 1) : null;
+      hour += 0.5;
+    }
+
+    this.updateDom();
   }
 
   updateDom() {
@@ -176,9 +188,14 @@ export class Booking {
   async sendBooking() {
     const { url, booking } = settings.db;
 
+    /* Check if item to update exists */
+    const updateItem = this.toUpdate.uuid;
+
     if (this.tableId) {
+      const itemId = updateItem ? '/' + this.toUpdate.id : '';
+
       const payload = {
-        uuid: utils.uuid(),
+        uuid: updateItem || utils.uuid(),
         date: this.date,
         hour: this.hourPicker.value,
         table: this.tableId,
@@ -192,16 +209,15 @@ export class Booking {
         starter.checked ? payload.starters.push(starter.value) : null;
       });
 
-      await fetch(`${url}/${booking}`, {
-        method: 'POST',
+      await fetch(`${url}/${booking}${itemId}`, {
+        method: updateItem ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(payload)
       });
 
-      // const parsedData = await response.json();
-      // console.log(parsedData);
+
       this.getData();
     }
   }
@@ -224,23 +240,19 @@ export class Booking {
   }
 
   async updateBookingData(uuid) {
+    const { datePicker, hourPicker } = select.widgets;
+
     /* Get booking to update*/
     const response = await fetch(`${this.db.url}/${this.db.booking}`);
     const parsedData = await response.json();
     this.toUpdate = parsedData.filter(booking => booking.uuid === uuid)[0];
 
-    /* Add booking data to html and to widgets */
-    const {
-      date,
-      starters,
-      phone,
-      address
-    } = this.toUpdate;
-    const { datePicker, hourPicker } = select.widgets;
-    let hour = this.toUpdate.hour;
-    hour = /:30/.test(hour) ? hour.replace(':30', '.5') : hour.replace(':00', '');
+    /* Destruct item */
+    const { date, starters, phone, address } = this.toUpdate;
+    let hour = utils.hourToNumber(this.toUpdate.hour);
     this.toUpdate.hour = hour;
 
+    /* Add booking data to html */
     this.dom.wrapper.querySelector(hourPicker.input).value = hour;
     this.dom.wrapper.querySelector(datePicker.input).value = date;
 
@@ -249,5 +261,7 @@ export class Booking {
     });
     this.dom.phone.value = phone;
     this.dom.address.value = address;
+
+    console.log('data updated');
   }
 }
