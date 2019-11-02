@@ -22,7 +22,8 @@ export class Booking {
     // console.log('data should be collected');
 
     this.initWidgets();
-    this.getData();
+    await this.getData();
+    console.log('234');
   }
 
   render(elem) {
@@ -61,9 +62,7 @@ export class Booking {
     this.peopleAmount = new AmountWidget(this.dom.peopleAmount, peopleAmount);
     this.datePicker = new DatePicker(this.dom.datePicker, date);
     this.hourPicker = new HourPicker(this.dom.hourPicker, hour);
-    // this.datePicker = new DatePicker(this.dom.datePicker, '2019-11-06');
-    // this.hourPicker = new HourPicker(this.dom.hourPicker, 14);
-    // this.hourPicker.value = 14;
+
     /* NA ROZMOWĘ
     wrzuciłem tutaj .bind i działa fajnie -> pytanie czy to dobrze?
     inaczej this leci na window,
@@ -79,7 +78,7 @@ export class Booking {
     });
   }
 
-  getData() {
+  async getData() {
     const {
       dateEndParamKey,
       dateStartParamKey,
@@ -110,26 +109,22 @@ export class Booking {
       eventsRepeat: `${url}/${event}?${params.eventsRepeat}`
     };
 
-    const self = this;
+    const responses = {
+      booking: await fetch(urls.booking),
+      eventsCurrent: await fetch(urls.eventsCurrent),
+      eventsRepeat: await fetch(urls.eventsRepeat)
+    };
 
-    Promise.all([
-      fetch(urls.booking),
-      fetch(urls.eventsCurrent),
-      fetch(urls.eventsRepeat)
-    ])
-      .then(function([bookingsResponse, eventsCurrentResponse, eventsRepeatResponse]) {
-        return Promise.all([
-          bookingsResponse.json(),
-          eventsCurrentResponse.json(),
-          eventsRepeatResponse.json()
-        ]);
-      })
-      .then(function([bookings, eventsCurrent, eventsRepeat]) {
-        self.parseData(bookings, eventsCurrent, eventsRepeat);
-      });
+    const parsedData = {
+      bookings: await responses.booking.json(),
+      eventsCurrent: await responses.eventsCurrent.json(),
+      eventsRepeat: await responses.eventsRepeat.json(),
+    };
+
+    this.parseData(parsedData);
   }
 
-  parseData(bookings, eventsCurrent, eventsRepeat) {
+  parseData({bookings, eventsCurrent, eventsRepeat}) {
     this.booked = {};
     const { maxDays, minDate } = this.datePicker;
     eventsCurrent.forEach(event => this.makeBooked(event));
