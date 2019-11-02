@@ -39,6 +39,11 @@ const app = {
 
     if (hash.length > 2) {
       pagesHash = this.pages.filter(page => page.id == hash.replace('#/', ''));
+      if (!pagesHash.length) {
+        pagesHash = this.pages.filter(
+          page => page.id == hash.substring(2,9)
+        );
+      }
     }
     this.activatePage(pagesHash.length ? pagesHash[0].id : this.pages[0].id);
 
@@ -49,9 +54,8 @@ const app = {
       });
     });
 
-    this.pages.forEach(page =>{
-      page.addEventListener('change-page', e => 
-        this.activatePage(e.detail.id));
+    this.pages.forEach(page => {
+      page.addEventListener('change-page', e => this.activatePage(e.detail.id));
     });
   },
 
@@ -61,6 +65,10 @@ const app = {
 
   activatePage: function(id) {
     const { active } = classNames.nav;
+    let updateId = id;
+    const re = /\w+\/\w+/;
+    re.test(id) ? (id = id.replace(re, '')) : null;
+    const update = re.test(id);
 
     this.navlinks.forEach(link => {
       link.classList.toggle(active, link.getAttribute('href') == `#${id}`);
@@ -68,8 +76,7 @@ const app = {
     this.pages.forEach(page =>
       page.classList.toggle(active, page.getAttribute('id') == id)
     );
-
-    window.location.hash = `#/${id}`;
+    update ? (window.location.hash = updateId) : (window.location.hash = `#/${id}`);
     this.toggleNavElements(id);
   },
 

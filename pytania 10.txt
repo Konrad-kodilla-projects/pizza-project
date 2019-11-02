@@ -3,7 +3,11 @@
 2. Konwencje nazywania zmniennych, funkcji i klas
 
 3. pytania w kodzie:
-    Booking.js -> render
+    Booking.js -> render, initWidgets
+    Home.js -> constructor
 
 
 4. kolejność układania metod w klasie
+
+5. Jakie bardziej zaawansowanie rzeczy o css należy wiedzieć? np animacje
+    lub co na pewno trzeba umieć zrobić?

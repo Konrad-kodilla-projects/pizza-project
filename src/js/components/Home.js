@@ -7,8 +7,15 @@ export class Home {
     this.init(elem);
   }
 
+  /* NA ROZMOWE
+  Czy jest jakaś lepsza opcja na to żeby pozostałe funkcje "poczekały" aż
+  async dostarczy dane? np.
+    construktor(){
+      this.getData().then( i tutaj wszystkie funcje?)
+    }
+  */
   async init(elem) {
-    const {url, slider, porfolio} = settings.db;
+    const { url, slider, porfolio } = settings.db;
 
     /* Get slides */
     const responseSlider = await fetch(`${url}/${slider}`);
@@ -20,7 +27,8 @@ export class Home {
     this.data.images = await responsePortfolio.json();
     // console.log('data collected');
 
-    /* Render elements */    
+    /* Render elements */
+
     this.render(elem);
     this.initSlider();
     this.initActions();
@@ -29,8 +37,8 @@ export class Home {
   render(elem) {
     /* Add handlebars context to wrapper */
     elem.innerHTML = templates.homePage(this.data);
-    const {slider, dot} = select.slider;
-    const {orderLink, bookingLink} = select.homePage;
+    const { slider, dot } = select.slider;
+    const { orderLink, bookingLink } = select.homePage;
 
     this.dom = {
       wrapper: elem,
@@ -41,39 +49,39 @@ export class Home {
     };
   }
 
-  initSlider(){
-    const {active, prev} = classNames.home;
+  initSlider() {
+    const { active, prev } = classNames.home;
     this.dom.slider.forEach((slide, id) => {
       slide.classList.toggle(prev, slide.classList.contains(active));
       slide.classList.toggle(active, this.slideId == id);
     });
 
-    this.dom.dot.forEach((dot, id) =>{
+    this.dom.dot.forEach((dot, id) => {
       dot.classList.toggle(active, this.slideId == id);
     });
 
-    this.slideId < this.data.slider.length - 1 ? this.slideId++ : this.slideId = 0;
-    setTimeout(this.initSlider.bind(this), 4000); 
+    this.slideId < this.data.slider.length - 1 ? this.slideId++ : (this.slideId = 0);
+    setTimeout(this.initSlider.bind(this), 4000);
   }
 
   initActions() {
-    const {bookingLink, orderLink} = select.homePage;
-    this.dom.bookingLink.addEventListener('click', () =>{
+    const { bookingLink, orderLink } = select.homePage;
+    this.dom.bookingLink.addEventListener('click', () => {
       this.announce(bookingLink);
     });
-    this.dom.orderLink.addEventListener('click', () =>{
+    this.dom.orderLink.addEventListener('click', () => {
       this.announce(orderLink);
     });
   }
-  
+
   announce(id) {
-    this.dom.wrapper.dispatchEvent(new CustomEvent('change-page', {
-      bubbles: true,
-      detail: {
-        id: id.replace('#', '')
-      }
-    }));
+    this.dom.wrapper.dispatchEvent(
+      new CustomEvent('change-page', {
+        bubbles: true,
+        detail: {
+          id: id.replace('#', '')
+        }
+      })
+    );
   }
-
-
 }

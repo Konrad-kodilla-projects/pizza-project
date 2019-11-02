@@ -9,6 +9,7 @@ export class Booking {
     this.render(elem);
     this.initWidgets();
     this.getData();
+    // this.updateBooking();
   }
   /*  NA ROZMOWĘ
   Czy this.dom można zapisać jakoś ładniej? bez pisania milion razy tego samego?  */
@@ -35,8 +36,10 @@ export class Booking {
     this.peopleAmount = new AmountWidget(this.dom.peopleAmount);
     this.datePicker = new DatePicker(this.dom.datePicker);
     this.hourPicker = new HourPicker(this.dom.hourPicker);
-    /* 
+    /* NA ROZMOWĘ
     wrzuciłem tutaj .bind i działa fajnie -> pytanie czy to dobrze?
+    inaczej this leci na window,
+    ta opcja co rozmawialiśmy => metoda = () => {funkcja} wywala mi ESLinta
     */
     this.dom.wrapper.addEventListener('updated', this.updateDom.bind(this));
     this.dom.tables.forEach(table =>
@@ -152,6 +155,7 @@ export class Booking {
 
     if(this.tableId) {
       const payload = {
+        uuid: utils.uuid(),
         date: this.date,
         hour: this.hourPicker.value,
         table: this.tableId,
@@ -177,8 +181,6 @@ export class Booking {
       // console.log(parsedData);
       this.getData();
     }
-
-
   }
 
   selectTable(e) {
@@ -196,5 +198,16 @@ export class Booking {
         this.tableId = 0;
       }
     }
+  }
+
+  updateBooking() {
+    // const { datePicker, hourPicker } = select.widgets;
+    // this.dom.wrapper.querySelector(hourPicker.input).value = 19;
+    // const hourUpdate = new HourPicker(this.dom.hourPicker);
+    // const test = this.dom.wrapper.querySelector(hourPicker.output);
+    // const test = this.dom.wrapper.querySelector('.hour-picker');
+    // this.hourPicker.value = 19;
+    // this.hoursAmount.value = 5;
+    // hourUpdate.value = 19;
   }
 }
