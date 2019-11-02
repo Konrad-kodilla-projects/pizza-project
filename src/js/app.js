@@ -53,6 +53,8 @@ const app = {
       page.addEventListener('change-page', e => 
         this.activatePage(e.detail.id));
     });
+
+    window.addEventListener('hashchange', this.initPages.bind(this));
   },
 
   initBooking: () => new Booking(document.querySelector(select.containerOf.booking)),
