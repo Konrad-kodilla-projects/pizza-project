@@ -7,6 +7,7 @@ import { utils } from '../utils.js';
 export class Booking {
   constructor(elem) {
     this.db = settings.db;
+    this.toUpdate = {};
 
     this.initPage(elem);
   }
@@ -54,10 +55,14 @@ export class Booking {
   }
 
   initWidgets() {
-    this.hoursAmount = new AmountWidget(this.dom.hoursAmount);
-    this.peopleAmount = new AmountWidget(this.dom.peopleAmount);
-    this.datePicker = new DatePicker(this.dom.datePicker);
-    this.hourPicker = new HourPicker(this.dom.hourPicker, 14);
+    const {date, duration, peopleAmount, hour} = this.toUpdate;
+
+    this.hoursAmount = new AmountWidget(this.dom.hoursAmount, duration);
+    this.peopleAmount = new AmountWidget(this.dom.peopleAmount, peopleAmount);
+    this.datePicker = new DatePicker(this.dom.datePicker, date);
+    this.hourPicker = new HourPicker(this.dom.hourPicker, hour);
+    // this.datePicker = new DatePicker(this.dom.datePicker, '2019-11-06');
+    // this.hourPicker = new HourPicker(this.dom.hourPicker, 14);
     // this.hourPicker.value = 14;
     /* NA ROZMOWĘ
     wrzuciłem tutaj .bind i działa fajnie -> pytanie czy to dobrze?
@@ -224,26 +229,28 @@ export class Booking {
   }
 
   async updateBookingData(uuid) {
+    /* Get booking to update*/
     const response = await fetch(`${this.db.url}/${this.db.booking}`);
     const parsedData = await response.json();
-    this.bookingToUpdate = parsedData.filter(booking => booking.uuid === uuid)[0];
-    const {date, duration, hour, peopleAmount, table, starters, phone, address} = this.bookingToUpdate;
-    
+    this.toUpdate = parsedData.filter(booking => booking.uuid === uuid)[0];
+
+    /* Add booking data to html and to widgets */
+    const {
+      date,
+      starters,
+      phone,
+      address
+    } = this.toUpdate;
     const { datePicker, hourPicker } = select.widgets;
-    // this.dom.wrapper.querySelector(hourPicker.input).value = hour;
-    // this.dom.wrapper.querySelector(hourPicker.input).value = 14;
+    let hour = this.toUpdate.hour;
+    hour = /:30/.test(hour) ? hour.replace(':30', '.5') : hour.replace(':00', '');
+    this.toUpdate.hour = hour;
+
+    this.dom.wrapper.querySelector(hourPicker.input).value = hour;
     this.dom.wrapper.querySelector(datePicker.input).value = date;
-    
-    
-    // const hourUpdate = new HourPicker(this.dom.hourPicker, 15);
-    // hourUpdate.value = 19;
-    // const test = this.dom.wrapper.querySelector(hourPicker.output);
-    // const test = this.dom.wrapper.querySelector('.hour-picker');
-    // this.hourPicker.value = 19;
-    this.dom.hoursAmount.querySelector('input').setAttribute('value', duration);
-    this.dom.peopleAmount.querySelector('input').value = peopleAmount;
-    this.dom.starter.forEach(starter =>{
-      starters.includes(starter.value) ? starter.checked = true : null;
+
+    this.dom.starter.forEach(starter => {
+      starters.includes(starter.value) ? (starter.checked = true) : null;
     });
     this.dom.phone.value = phone;
     this.dom.address.value = address;

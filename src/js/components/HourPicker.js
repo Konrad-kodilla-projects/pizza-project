@@ -5,7 +5,6 @@ import { utils } from '../utils.js';
 export class HourPicker extends BaseWidget {
   constructor(wrapper, initValue) {
     super(wrapper, settings.hours.open);
-    console.log('TCL: HourPicker -> constructor -> initValue', initValue);
 
     const { input, output } = select.widgets.hourPicker;
     this.dom.input = this.dom.wrapper.querySelector(input);

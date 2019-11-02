@@ -2,11 +2,12 @@ import { select, settings } from '../settings.js';
 import { BaseWidget } from './BaseWidget.js';
 
 export class AmountWidget extends BaseWidget {
-  constructor(wrapper) {
+  constructor(wrapper, initValue) {
     super(wrapper, settings.amountWidget.defaultValue);
 
     this.getElements();
     this.initActions();
+    initValue ? this.dom.input.value = initValue : null;
   }
 
   isValid(val){
