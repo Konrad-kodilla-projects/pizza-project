@@ -1,54 +1,41 @@
 import { select, settings } from '../settings.js';
+import { BaseWidget } from './BaseWidget.js';
 
-export class AmountWidget {
-  constructor(elem) {
-    this.value = 1;
+export class AmountWidget extends BaseWidget {
+  constructor(wrapper) {
+    super(wrapper, settings.amountWidget.defaultValue);
 
-    this.getElements(elem);
-    this.setValue(this.input.value);
+    this.getElements();
     this.initActions();
   }
 
-  setValue(val) {
-    const newValue = parseInt(val);
-    const range = settings.amountWidget;
-    if (
-      newValue !== this.value &&
-      newValue >= range.defaultMin &&
-      newValue <= range.defaultMax
-    ) {
-      this.value = newValue;
-      this.announce();
-    }
-    this.input.value = this.value;
+  isValid(val){
+    const {defaultMax: max, defaultMin: min} = settings.amountWidget;
+    return !isNaN(val) && val >= min && val <= max;
   }
 
   initActions() {
-    this.input.addEventListener('change', () => this.setValue(this.input.value));
+    this.dom.input.addEventListener('change', () => this.value = this.dom.input.value);
 
-    this.linkDecrease.addEventListener('click', e => {
+    this.dom.linkDecrease.addEventListener('click', e => {
       e.preventDefault();
-      // Na rozmowę => nie prościej jest this.value++?
-      this.setValue(this.value - 1);
+      this.value--;
     });
 
-    this.linkIncrease.addEventListener('click', e => {
+    this.dom.linkIncrease.addEventListener('click', e => {
       e.preventDefault();
-      this.setValue(this.value + 1);
+      this.value++;
     });
   }
 
-  announce() {
-    const event = new CustomEvent('updated', {
-      bubbles: true
-    });
-    this.element.dispatchEvent(event);
+  renderValue(){
+    this.dom.input.value = this.value;
   }
 
-  getElements(element) {
-    this.element = element;
-    this.input = this.element.querySelector(select.widgets.amount.input);
-    this.linkDecrease = this.element.querySelector(select.widgets.amount.linkDecrease);
-    this.linkIncrease = this.element.querySelector(select.widgets.amount.linkIncrease);
+  getElements() {
+    const amount = select.widgets.amount;
+    Object.keys(amount).forEach(
+      elem => (this.dom[elem] = this.dom.wrapper.querySelector(amount[elem]))
+    );
   }
 }
