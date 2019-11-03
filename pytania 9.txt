@@ -1,0 +1,1 @@
+1. Używanie przestrzeni nazw (do czego i po co?) -> DOM lvl 1 vs DOM lvl 2 https://developer.mozilla.org/pl/docs/Web/API/Element/getAttribute

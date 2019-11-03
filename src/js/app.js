@@ -1,6 +1,7 @@
 import { Product } from './components/Product.js';
 import { Cart } from './components/Cart.js';
-import { settings, select } from './settings.js';
+import { settings, select, classNames } from './settings.js';
+import { Booking } from './components/Booking.js';
 
 const app = {
   initMenu: function() {
@@ -29,9 +30,46 @@ const app = {
     this.productList.addEventListener('add-to-cart', e => app.cart.add(e.detail.product));
   },
 
+  initPages: function() {
+    this.pages = Array.from(document.querySelector(select.containerOf.pages).children);
+    this.navlinks = Array.from(document.querySelectorAll(select.nav.links));
+    let pagesHash = [];
+    const { hash } = window.location;
+
+    if (hash.length > 2) {
+      pagesHash = this.pages.filter(page => page.id == hash.replace('#/', ''));
+    }
+    this.activatePage(pagesHash.length ? pagesHash[0].id : this.pages[0].id);
+
+    this.navlinks.forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+
+        this.activatePage(link.getAttribute('href').replace('#', ''));
+      });
+    });
+  },
+
+  initBooking: () => new Booking(document.querySelector(select.containerOf.booking)),
+
+  activatePage: function(id) {
+    const { active } = classNames.nav;
+
+    this.navlinks.forEach(link => {
+      link.classList.toggle(active, link.getAttribute('href') == `#${id}`);
+    });
+    this.pages.forEach(page =>
+      page.classList.toggle(active, page.getAttribute('id') == id)
+    );
+
+    window.location.hash = `#/${id}`;
+  },
+
   init: function() {
+    this.initPages();
     this.initData();
     this.initCart();
+    this.initBooking();
   }
 };
 
