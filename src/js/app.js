@@ -43,6 +43,13 @@ const app = {
         pagesHash = this.pages.filter(page => page.id == hash.substring(2, 9));
       }
     }
+
+    /* Na rozmowę
+      Chciałem tutaj w linijce pod spodem odpalać tak że jak się wpisze uuid to
+      żeby strona się sama przeładowała ale raz miałem this.booking a raz nie
+    */
+    // hash.length > 12 ? this.booking.updateBookingData() : null;
+
     this.activatePage(pagesHash.length ? pagesHash[0].id : this.pages[0].id, hash.substring(10));
 
     this.navlinks.forEach(link => {
@@ -52,14 +59,20 @@ const app = {
       });
     });
 
+  },
+
+  initActions: function() {
     this.pages.forEach(page => {
       page.addEventListener('change-page', e => this.activatePage(e.detail.id));
     });
 
     window.addEventListener('hashchange', this.initPages.bind(this));
+
   },
 
-  initBooking: () => new Booking(document.querySelector(select.containerOf.booking)),
+  initBooking: function() {
+    this.booking = new Booking(document.querySelector(select.containerOf.booking));
+  },
 
   initHome: () => new Home(document.querySelector(select.containerOf.home)),
 
@@ -86,6 +99,7 @@ const app = {
 
   init: function() {
     this.initPages();
+    this.initActions();
     this.initData();
     this.initCart();
     this.initBooking();

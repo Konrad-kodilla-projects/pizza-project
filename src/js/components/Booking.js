@@ -11,7 +11,6 @@ export class Booking {
 
     this.initPage(elem);
     console.log(location);
-
   }
 
   async initPage(elem) {
@@ -35,7 +34,11 @@ export class Booking {
       button,
       address,
       phone,
-      starter
+      starter,
+      buttonDelete,
+      modal,
+      modalClose,
+      modalLink
     } = select.booking;
     const { datePicker, hourPicker } = select.widgets;
     elem.innerHTML = templates.bookingWidget();
@@ -52,7 +55,11 @@ export class Booking {
       button: elem.querySelector(button),
       address: elem.querySelector(address),
       phone: elem.querySelector(phone),
-      starter: elem.querySelectorAll(starter)
+      starter: elem.querySelectorAll(starter),
+      buttonDelete: elem.querySelector(buttonDelete),
+      modal: elem.querySelector(modal),
+      modalClose: elem.querySelector(modalClose),
+      modalLink: elem.querySelector(modalLink)
     };
   }
 
@@ -77,6 +84,13 @@ export class Booking {
       e.preventDefault();
       this.sendBooking();
     });
+    this.dom.buttonDelete.addEventListener('click', e => {
+      e.preventDefault();
+      this.deleteBooking();
+    });
+    this.dom.modalClose.addEventListener('click', () =>
+      this.dom.modal.classList.remove(classNames.booking.active)
+    );
   }
 
   async getData() {
@@ -217,8 +231,15 @@ export class Booking {
         body: JSON.stringify(payload)
       });
 
-
       this.getData();
+
+      const { modal, modalLink } = this.dom;
+      const href =
+        location.hash.length > 12 ? location.href : location.href + '/' + payload.uuid;
+      
+      modalLink.setAttribute('href', href);
+      modalLink.innerHTML = href;
+      modal.classList.add(classNames.booking.active);
     }
   }
 
@@ -261,7 +282,17 @@ export class Booking {
     });
     this.dom.phone.value = phone;
     this.dom.address.value = address;
+    this.dom.button.innerHTML = 'Update Booking';
 
     console.log('data updated');
+  }
+
+  async deleteBooking() {
+    console.log(this.toUpdate);
+    await fetch(`${this.db.url}/${this.db.booking}/${this.toUpdate.id}`, {
+      method: 'DELETE'
+    });
+
+    this.updateDom();
   }
 }

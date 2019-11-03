@@ -67,10 +67,14 @@ export const select = {
     peopleAmount: '.people-amount',
     hoursAmount: '.hours-amount',
     tables: '.floor-plan .table',
-    button: '[type="submit"]',
+    button: '#booking-submit',
+    buttonDelete: '#booking-delete',
     phone: '[name="phone"]',
     address: '[name="address"]',
     starter: '[name="starter"]',
+    modal: '.modal-booking',
+    modalClose: '.modal__close',
+    modalLink: '.modal__link'
   },
   nav: {
     links: '.main-nav a',
@@ -96,7 +100,8 @@ export const classNames = {
   booking: {
     loading: 'loading',
     tableBooked: 'booked',
-    reserved: 'reserved'
+    reserved: 'reserved',
+    active: 'modal__active'
   },
   nav: {
     active: 'active',
