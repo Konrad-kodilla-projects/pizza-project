@@ -1,4 +1,4 @@
-import { templates, select, settings } from '../settings.js';
+import { templates, select, settings, classNames } from '../settings.js';
 import { AmountWidget } from './AmountWidget.js';
 import { DatePicker } from './DatePicker.js';
 import { HourPicker } from './HourPicker.js';
@@ -12,14 +12,16 @@ export class Booking {
   }
 
   render(elem) {
-    const { peopleAmount, hoursAmount } = select.booking;
+    const { peopleAmount, hoursAmount, tables } = select.booking;
     const { datePicker, hourPicker } = select.widgets;
+    elem.innerHTML = templates.bookingWidget();
     this.dom = {
-      wrapper: (elem.innerHTML = templates.bookingWidget()),
+      wrapper: elem,
       peopleAmount: elem.querySelector(peopleAmount),
       hoursAmount: elem.querySelector(hoursAmount),
       datePicker: elem.querySelector(datePicker.wrapper),
-      hourPicker: elem.querySelector(hourPicker.wrapper)
+      hourPicker: elem.querySelector(hourPicker.wrapper),
+      tables: elem.querySelectorAll(tables)
     };
   }
 
@@ -28,6 +30,7 @@ export class Booking {
     this.peopleAmount = new AmountWidget(this.dom.peopleAmount);
     this.datePicker = new DatePicker(this.dom.datePicker);
     this.hourPicker = new HourPicker(this.dom.hourPicker);
+    this.dom.wrapper.addEventListener('updated', () => this.updateDom());
   }
 
   getData() {
@@ -91,7 +94,7 @@ export class Booking {
         this.makeBooked(event);
       }
     });
-    console.log(this.booked);
+    this.updateDom();
   }
 
   makeBooked({ date, hour, duration, table }) {
@@ -103,5 +106,23 @@ export class Booking {
       !bookDate[hour] ? (bookDate[hour] = [table]) : bookDate[hour].push(table);
       hour = (Number(hour) + 0.5).toString();
     }
+  }
+
+  updateDom() {
+    const {tableIdAttribute: id} = settings.booking;
+    this.date = this.datePicker.value;
+    this.hour = utils.hourToNumber(this.hourPicker.value);
+
+    this.dom.tables.forEach(table => {
+      const tableId = table.getAttribute(id);
+      const bookDate = this.booked[this.date];
+      const {tableBooked} = classNames.booking;
+
+      if(bookDate && bookDate[this.hour] && bookDate[this.hour].includes(Number(tableId))){
+        table.classList.add(tableBooked);
+      } else {
+        table.classList.remove(tableBooked);
+      }
+    });
   }
 }
