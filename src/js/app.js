@@ -2,6 +2,7 @@ import { Product } from './components/Product.js';
 import { Cart } from './components/Cart.js';
 import { settings, select, classNames } from './settings.js';
 import { Booking } from './components/Booking.js';
+import { Home } from './components/Home.js';
 
 const app = {
   initMenu: function() {
@@ -52,6 +53,8 @@ const app = {
 
   initBooking: () => new Booking(document.querySelector(select.containerOf.booking)),
 
+  initHome: () => new Home(document.querySelector(select.containerOf.home)),
+
   activatePage: function(id) {
     const { active } = classNames.nav;
 
@@ -70,6 +73,7 @@ const app = {
     this.initData();
     this.initCart();
     this.initBooking();
+    this.initHome();
   }
 };
 

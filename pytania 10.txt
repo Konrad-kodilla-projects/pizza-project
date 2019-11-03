@@ -1,0 +1,9 @@
+1. Czy na przykład warto pobawić się codewars?
+
+2. Konwencje nazywania zmniennych, funkcji i klas
+
+3. pytania w kodzie:
+    Booking.js -> render
+
+
+4. kolejność układania metod w klasie

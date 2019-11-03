@@ -1,3 +1,23 @@
 1. Używanie przestrzeni nazw (do czego i po co?) -> DOM lvl 1 vs DOM lvl 2 https://developer.mozilla.org/pl/docs/Web/API/Element/getAttribute
 
 2. pytania innych kursantów
+
+3. Czy często używa się custom eventów i co warto o nich wiedzieć?
+
+4. Chciałbym się więcej dowiedzieć o promisach i async await - różnicach
+
+5. Czym jest cachowanie i jak się go stosuje we frontendzie?
+
+6. gdzie czerpać inspirację/przykłady do designu stron/aplikacji?
+
+7. Czy wiedza na temat SEO i optymalizacji stron pod kątem wyszukiwania jest ważne dla frontend deva?
+
+8. Czy tworzenie configu webpacka leży po stronie developera czy dostaje z góry i używa? Jeśli tak to
+    co jest najważniejsze żeby o nim wiedzieć?
+
+
+======
+
+3. będą trudne w debugowaniu
+
+8. Webpack - aliasy

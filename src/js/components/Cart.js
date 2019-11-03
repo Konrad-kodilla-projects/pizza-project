@@ -104,7 +104,6 @@ export class Cart {
       .then(parsedData => {
         console.log(parsedData);
       });
-    console.log('tutaj jestem');
   }
 
   getData(obj) {
