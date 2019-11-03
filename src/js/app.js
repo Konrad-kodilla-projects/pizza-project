@@ -45,10 +45,16 @@ const app = {
     this.navlinks.forEach(link => {
       link.addEventListener('click', e => {
         e.preventDefault();
-
         this.activatePage(link.getAttribute('href').replace('#', ''));
       });
     });
+
+    this.pages.forEach(page =>{
+      page.addEventListener('change-page', e => 
+        this.activatePage(e.detail.id));
+    });
+
+    window.addEventListener('hashchange', this.initPages.bind(this));
   },
 
   initBooking: () => new Booking(document.querySelector(select.containerOf.booking)),
@@ -66,6 +72,15 @@ const app = {
     );
 
     window.location.hash = `#/${id}`;
+    this.toggleNavElements(id);
+  },
+
+  toggleNavElements: function(pageId) {
+    const { mainNav, cart, header } = select.containerOf;
+    const { hide } = classNames.home;
+    [mainNav, cart, header].forEach(elem =>
+      document.querySelector(elem).classList.toggle(hide, pageId === 'home')
+    );
   },
 
   init: function() {
