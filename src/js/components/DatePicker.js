@@ -13,9 +13,9 @@ export class DatePicker extends BaseWidget {
   }
 
   initPlugin(){
-    const {maxDaysInFuture: maxDays} = settings.datePicker;
+    this.maxDays = settings.datePicker.maxDaysInFuture;
     this.minDate = new Date(this.value);
-    this.maxDate = utils.addDays(this.minDate, maxDays);
+    this.maxDate = utils.addDays(this.minDate, this.maxDays);
 
     // init plugin
     // eslint-disable-next-line no-undef
