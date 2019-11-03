@@ -6,16 +6,45 @@ import { utils } from '../utils.js';
 
 export class Booking {
   constructor(elem) {
-    this.render(elem);
-    this.initWidgets();
-    this.getData();
+    this.db = settings.db;
+    this.toUpdate = {};
+
+    this.initPage(elem);
+    console.log(location);
   }
-  /*  NA ROZMOWĘ
-  Czy this.dom można zapisać jakoś ładniej? bez pisania milion razy tego samego?  */
+
+  async initPage(elem) {
+    this.render(elem);
+
+    /* Check if booking has uuid */
+    const { hash } = window.location;
+    const re = /#\/\w+\/\w+/;
+    re.test(hash) ? await this.updateBookingData(hash.substring(10)) : null;
+
+    this.initWidgets();
+    await this.getData();
+    this.removeBooked(this.toUpdate);
+  }
+
   render(elem) {
-    const { peopleAmount, hoursAmount, tables, button, address, phone, starter } = select.booking;
+    const {
+      peopleAmount,
+      hoursAmount,
+      tables,
+      button,
+      address,
+      phone,
+      starter,
+      buttonDelete,
+      modal,
+      modalClose,
+      modalLink
+    } = select.booking;
     const { datePicker, hourPicker } = select.widgets;
     elem.innerHTML = templates.bookingWidget();
+
+    /*  NA ROZMOWĘ
+    Czy this.dom można zapisać jakoś ładniej? bez pisania milion razy tego samego?  */
     this.dom = {
       wrapper: elem,
       peopleAmount: elem.querySelector(peopleAmount),
@@ -26,17 +55,26 @@ export class Booking {
       button: elem.querySelector(button),
       address: elem.querySelector(address),
       phone: elem.querySelector(phone),
-      starter: elem.querySelectorAll(starter)
+      starter: elem.querySelectorAll(starter),
+      buttonDelete: elem.querySelector(buttonDelete),
+      modal: elem.querySelector(modal),
+      modalClose: elem.querySelector(modalClose),
+      modalLink: elem.querySelector(modalLink)
     };
   }
 
   initWidgets() {
-    this.hoursAmount = new AmountWidget(this.dom.hoursAmount);
-    this.peopleAmount = new AmountWidget(this.dom.peopleAmount);
-    this.datePicker = new DatePicker(this.dom.datePicker);
-    this.hourPicker = new HourPicker(this.dom.hourPicker);
-    /* 
+    const { date, duration, peopleAmount, hour } = this.toUpdate;
+
+    this.hoursAmount = new AmountWidget(this.dom.hoursAmount, duration);
+    this.peopleAmount = new AmountWidget(this.dom.peopleAmount, peopleAmount);
+    this.datePicker = new DatePicker(this.dom.datePicker, date);
+    this.hourPicker = new HourPicker(this.dom.hourPicker, hour);
+
+    /* NA ROZMOWĘ
     wrzuciłem tutaj .bind i działa fajnie -> pytanie czy to dobrze?
+    inaczej this leci na window,
+    ta opcja co rozmawialiśmy => metoda = () => {funkcja} wywala mi ESLinta
     */
     this.dom.wrapper.addEventListener('updated', this.updateDom.bind(this));
     this.dom.tables.forEach(table =>
@@ -46,9 +84,16 @@ export class Booking {
       e.preventDefault();
       this.sendBooking();
     });
+    this.dom.buttonDelete.addEventListener('click', e => {
+      e.preventDefault();
+      this.deleteBooking();
+    });
+    this.dom.modalClose.addEventListener('click', () =>
+      this.dom.modal.classList.remove(classNames.booking.active)
+    );
   }
 
-  getData() {
+  async getData() {
     const {
       dateEndParamKey,
       dateStartParamKey,
@@ -79,26 +124,22 @@ export class Booking {
       eventsRepeat: `${url}/${event}?${params.eventsRepeat}`
     };
 
-    const self = this;
+    const responses = {
+      booking: await fetch(urls.booking),
+      eventsCurrent: await fetch(urls.eventsCurrent),
+      eventsRepeat: await fetch(urls.eventsRepeat)
+    };
 
-    Promise.all([
-      fetch(urls.booking),
-      fetch(urls.eventsCurrent),
-      fetch(urls.eventsRepeat)
-    ])
-      .then(function([bookingsResponse, eventsCurrentResponse, eventsRepeatResponse]) {
-        return Promise.all([
-          bookingsResponse.json(),
-          eventsCurrentResponse.json(),
-          eventsRepeatResponse.json()
-        ]);
-      })
-      .then(function([bookings, eventsCurrent, eventsRepeat]) {
-        self.parseData(bookings, eventsCurrent, eventsRepeat);
-      });
+    const parsedData = {
+      bookings: await responses.booking.json(),
+      eventsCurrent: await responses.eventsCurrent.json(),
+      eventsRepeat: await responses.eventsRepeat.json()
+    };
+
+    this.parseData(parsedData);
   }
 
-  parseData(bookings, eventsCurrent, eventsRepeat) {
+  parseData({ bookings, eventsCurrent, eventsRepeat }) {
     this.booked = {};
     const { maxDays, minDate } = this.datePicker;
     eventsCurrent.forEach(event => this.makeBooked(event));
@@ -115,12 +156,23 @@ export class Booking {
   makeBooked({ date, hour, duration, table }) {
     !this.booked[date] ? (this.booked[date] = {}) : null;
     let bookDate = this.booked[date];
-    hour = /:30/.test(hour) ? hour.replace(':30', '.5') : hour.replace(':00', '');
+    hour = utils.hourToNumber(hour);
 
     for (let i = 0; i <= duration * 2 - 1; i++) {
       !bookDate[hour] ? (bookDate[hour] = [table]) : bookDate[hour].push(table);
-      hour = (Number(hour) + 0.5).toString();
+      hour += 0.5;
     }
+  }
+
+  removeBooked({ date, hour, duration, table }) {
+    const bookDate = this.booked[date];
+
+    for (let i = 0; i <= duration * 2 - 1; i++) {
+      bookDate[hour] ? bookDate[hour].splice(bookDate[hour].indexOf(table), 1) : null;
+      hour += 0.5;
+    }
+
+    this.updateDom();
   }
 
   updateDom() {
@@ -148,10 +200,16 @@ export class Booking {
   }
 
   async sendBooking() {
-    const {url, booking} = settings.db;
+    const { url, booking } = settings.db;
 
-    if(this.tableId) {
+    /* Check if item to update exists */
+    const updateItem = this.toUpdate.uuid;
+
+    if (this.tableId) {
+      const itemId = updateItem ? '/' + this.toUpdate.id : '';
+
       const payload = {
+        uuid: updateItem || utils.uuid(),
         date: this.date,
         hour: this.hourPicker.value,
         table: this.tableId,
@@ -165,20 +223,24 @@ export class Booking {
         starter.checked ? payload.starters.push(starter.value) : null;
       });
 
-      await fetch(`${url}/${booking}`, {
-        method: 'POST',
+      await fetch(`${url}/${booking}${itemId}`, {
+        method: updateItem ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json'
-        },          
+        },
         body: JSON.stringify(payload)
       });
 
-      // const parsedData = await response.json();
-      // console.log(parsedData);
       this.getData();
+
+      const { modal, modalLink } = this.dom;
+      const href =
+        location.hash.length > 12 ? location.href : location.href + '/' + payload.uuid;
+      
+      modalLink.setAttribute('href', href);
+      modalLink.innerHTML = href;
+      modal.classList.add(classNames.booking.active);
     }
-
-
   }
 
   selectTable(e) {
@@ -196,5 +258,41 @@ export class Booking {
         this.tableId = 0;
       }
     }
+  }
+
+  async updateBookingData(uuid) {
+    const { datePicker, hourPicker } = select.widgets;
+
+    /* Get booking to update*/
+    const response = await fetch(`${this.db.url}/${this.db.booking}`);
+    const parsedData = await response.json();
+    this.toUpdate = parsedData.filter(booking => booking.uuid === uuid)[0];
+
+    /* Destruct item */
+    const { date, starters, phone, address } = this.toUpdate;
+    let hour = utils.hourToNumber(this.toUpdate.hour);
+    this.toUpdate.hour = hour;
+
+    /* Add booking data to html */
+    this.dom.wrapper.querySelector(hourPicker.input).value = hour;
+    this.dom.wrapper.querySelector(datePicker.input).value = date;
+
+    this.dom.starter.forEach(starter => {
+      starters.includes(starter.value) ? (starter.checked = true) : null;
+    });
+    this.dom.phone.value = phone;
+    this.dom.address.value = address;
+    this.dom.button.innerHTML = 'Update Booking';
+
+    console.log('data updated');
+  }
+
+  async deleteBooking() {
+    console.log(this.toUpdate);
+    await fetch(`${this.db.url}/${this.db.booking}/${this.toUpdate.id}`, {
+      method: 'DELETE'
+    });
+
+    this.updateDom();
   }
 }

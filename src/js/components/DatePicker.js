@@ -3,11 +3,12 @@ import { utils } from '../utils.js';
 import { select, settings } from '../settings.js';
 
 export class DatePicker extends BaseWidget {
-  constructor(wrapper){
+  constructor(wrapper, updatedDate=0){
     super(wrapper, utils.dateToStr(new Date()));
 
     const {input} = select.widgets.datePicker;
     this.dom.input = this.dom.wrapper.querySelector(input);
+    updatedDate ? this.updatedDate = new Date(updatedDate) : null;
 
     this.initPlugin();
   }
@@ -22,7 +23,7 @@ export class DatePicker extends BaseWidget {
     flatpickr(this.dom.input, {
       maxDate: this.maxDate,
       minDate: this.minDate,
-      defaultDate: this.minDate,
+      defaultDate: this.updatedDate || this.minDate,
       disable: [
         function(date){
           return date.getDay() === 1;

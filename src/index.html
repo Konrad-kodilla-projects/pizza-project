@@ -75,7 +75,9 @@
     <section id="booking">
       <div class="booking-wrapper container"></div>
     </section>
-
+    <section id="update">
+        <div class="booking-wrapper container"></div>
+    </section>
   </div>
 
   <script id="template-home" type="text/x-handlebars-template">
@@ -143,7 +145,8 @@
       </footer>
     </div>
   </script>
-
+  
+  <!-- Booking -->
   <script id="template-booking-widget" type="text/x-handlebars-template">
     <div class="booking-widget">
       <h2 class="page__title no-spacing">Book a table</h2>
@@ -204,9 +207,15 @@
         <div class="order-confirmation">
           <input type="tel" name="phone" placeholder="Your phone">
           <input type="text" name="address" placeholder="Your address">
-          <button type="submit" class="btn-secondary">Book table</button>
+          <button id="booking-submit" type="submit" class="btn-secondary">Book table</button>
+          <button id="booking-delete" type="submit" class="btn-secondary">Delete</button>
         </div>
       </form>
+      <div class="modal-booking">
+        <h2 class="modal__text">Your booking link is:</h2>
+        <a class="modal__link" href="#"></a>
+        <div class="modal__close">x</div>
+      </div>
     </div>
   </script>
 

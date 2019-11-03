@@ -255,7 +255,22 @@
       "starters": ["lemonWater"]
     }
   ],
-  "booking": [],
+  "booking": [
+    {
+      "uuid": "7bfa5d84-c38e-4e14-9dab-95905cabe1d5",
+      "date": "2019-11-03",
+      "hour": "12:00",
+      "table": 1,
+      "peopleAmount": 2,
+      "duration": 3,
+      "phone": "",
+      "address": "",
+      "starters": [
+        "water"
+      ],
+      "id": 1
+    }
+  ],
   "slider": [
     {
       "id": 1,

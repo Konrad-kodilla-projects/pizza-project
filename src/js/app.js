@@ -39,8 +39,18 @@ const app = {
 
     if (hash.length > 2) {
       pagesHash = this.pages.filter(page => page.id == hash.replace('#/', ''));
+      if (!pagesHash.length) {
+        pagesHash = this.pages.filter(page => page.id == hash.substring(2, 9));
+      }
     }
-    this.activatePage(pagesHash.length ? pagesHash[0].id : this.pages[0].id);
+
+    /* Na rozmowę
+      Chciałem tutaj w linijce pod spodem odpalać tak że jak się wpisze uuid to
+      żeby strona się sama przeładowała ale raz miałem this.booking a raz nie
+    */
+    // hash.length > 12 ? this.booking.updateBookingData() : null;
+
+    this.activatePage(pagesHash.length ? pagesHash[0].id : this.pages[0].id, hash.substring(10));
 
     this.navlinks.forEach(link => {
       link.addEventListener('click', e => {
@@ -49,19 +59,23 @@ const app = {
       });
     });
 
-    this.pages.forEach(page =>{
-      page.addEventListener('change-page', e => 
-        this.activatePage(e.detail.id));
+  },
+
+  initActions: function() {
+    this.pages.forEach(page => {
+      page.addEventListener('change-page', e => this.activatePage(e.detail.id));
     });
 
     window.addEventListener('hashchange', this.initPages.bind(this));
   },
 
-  initBooking: () => new Booking(document.querySelector(select.containerOf.booking)),
+  initBooking: function() {
+    this.booking = new Booking(document.querySelector(select.containerOf.booking));
+  },
 
   initHome: () => new Home(document.querySelector(select.containerOf.home)),
 
-  activatePage: function(id) {
+  activatePage: function(id, uuid='') {
     const { active } = classNames.nav;
 
     this.navlinks.forEach(link => {
@@ -70,8 +84,7 @@ const app = {
     this.pages.forEach(page =>
       page.classList.toggle(active, page.getAttribute('id') == id)
     );
-
-    window.location.hash = `#/${id}`;
+    uuid ? window.location.hash = `#/${id}/${uuid}` : (window.location.hash = `#/${id}`);
     this.toggleNavElements(id);
   },
 
@@ -85,6 +98,7 @@ const app = {
 
   init: function() {
     this.initPages();
+    this.initActions();
     this.initData();
     this.initCart();
     this.initBooking();

@@ -10,6 +10,8 @@
 
 .booking-widget {
   transform: opacity 500ms;
+  position: relative;
+  overflow: hidden;
 
   &.loading {
     opacity: 0.25;
@@ -208,4 +210,38 @@
 .booking-options {
   @include flex(row, flex-start, space-between);
   margin: ($base-size * 4) auto;
+}
+
+.modal-booking {
+  opacity: 0;
+  position: absolute;
+  width: 60vh;
+  height: 20vh;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #eee;
+  border: 2px solid #333;
+  border-radius: $radius;
+  transition: all 0.5s;
+  text-align: center;
+}
+
+.modal {
+  &__close {
+    margin: 0;
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+    right: 5px;
+    top: 5px;
+    background-color: #fff;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  &__active {
+    opacity: 1;
+    @include center;
+  }
 }
